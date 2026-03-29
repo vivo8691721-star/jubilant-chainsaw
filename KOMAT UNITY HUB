@@ -8,7 +8,7 @@ local player = game.Players.LocalPlayer
 
 local Window = WindUI:CreateWindow({
 Title = "KOMAT UNITY Hub",
-Icon = "door-open",
+Icon = "eye",
 Author = "by .komat",
 Folder = "MySuperHub",
 
