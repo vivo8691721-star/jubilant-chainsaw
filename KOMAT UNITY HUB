@@ -1,0 +1,1491 @@
+local WindUI = loadstring(game:HttpGet(
+"https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"
+))()
+
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+local player = game.Players.LocalPlayer
+
+local Window = WindUI:CreateWindow({
+Title = "KOMAT UNITY Hub",
+Icon = "door-open",
+Author = "by .komat",
+Folder = "MySuperHub",
+
+Size = UDim2.fromOffset(580, 460),  
+MinSize = Vector2.new(560, 350),  
+MaxSize = Vector2.new(850, 560),  
+Transparent = true,  
+Theme = "Dark",  
+Resizable = true,  
+SideBarWidth = 200,  
+BackgroundImageTransparency = 0.42,  
+HideSearchBar = true,  
+ScrollBarEnabled = false,
+
+})
+
+local SettingsTab = Window:Tab({Title="Settings", Icon="wrench"})
+local MainTab     = Window:Tab({Title="Main Menu", Icon="star"})
+local TeleportTab = Window:Tab({Title="Teleport", Icon="navigation"})
+local VisualsTab  = Window:Tab({Title="Visuals", Icon="eye"})
+local ExtraTab    = Window:Tab({Title="Extras", Icon="tag"})
+local FPSTab      = Window:Tab({Title="FPS", Icon="speedometer"})
+local MapTab    = Window:Tab({Title="Map", Icon="map"})
+local EventTab    = Window:Tab({Title="Events", Icon="calendar"})
+
+local autoJump = false
+local floatingJumpButton
+local FloatingGui
+
+-- GUI ปุ่มลอย
+FloatingGui = Instance.new("ScreenGui")
+FloatingGui.Name = "FloatingJumpGui"
+FloatingGui.ResetOnSpawn = false
+FloatingGui.Enabled = false
+FloatingGui.Parent = player:WaitForChild("PlayerGui")
+
+-- สร้างปุ่มลอย
+local function createFloatingJumpButton()
+
+if floatingJumpButton then return end  
+
+local btn = Instance.new("TextButton")  
+btn.Size = UDim2.new(0,140,0,52)  
+btn.Position = UDim2.new(0.5,-70,0.8,0)  
+btn.AnchorPoint = Vector2.new(0.5,0)  
+btn.BackgroundColor3 = Color3.fromRGB(180,220,255)  
+btn.BackgroundTransparency = 0.35  
+btn.TextColor3 = Color3.fromRGB(0,70,150)  
+btn.Text = "Auto Jump : OFF"  
+btn.Font = Enum.Font.GothamBold  
+btn.TextSize = 14  
+btn.Parent = FloatingGui  
+btn.Active = true  
+btn.Draggable = true  
+
+local corner = Instance.new("UICorner", btn)  
+corner.CornerRadius = UDim.new(0,18)  
+
+local stroke = Instance.new("UIStroke", btn)  
+stroke.Thickness = 2.5  
+stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border  
+stroke.Color = Color3.fromRGB(80,170,255)  
+
+floatingJumpButton = btn  
+
+task.spawn(function()  
+	while btn.Parent do  
+
+		TweenService:Create(  
+			stroke,  
+			TweenInfo.new(0.9, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut),  
+			{Color = Color3.fromRGB(0,90,255)}  
+		):Play()  
+
+		task.wait(0.9)  
+
+		TweenService:Create(  
+			stroke,  
+			TweenInfo.new(0.9, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut),  
+			{Color = Color3.fromRGB(150,230,255)}  
+		):Play()  
+
+		task.wait(0.9)  
+
+	end  
+end)  
+
+btn.MouseButton1Click:Connect(function()  
+
+	autoJump = not autoJump  
+
+	if autoJump then  
+		btn.Text = "Auto Jump : ON"  
+	else  
+		btn.Text = "Auto Jump : OFF"  
+	end  
+
+end)
+
+end
+
+createFloatingJumpButton()
+
+-- Toggle Auto Jump
+MainTab:Toggle({
+Title = "Auto Jump",
+Default = false,
+Callback = function(state)
+
+autoJump = state  
+
+    if floatingJumpButton then  
+        if state then  
+            floatingJumpButton.Text = "Auto Jump : ON"  
+        else  
+            floatingJumpButton.Text = "Auto Jump : OFF"  
+        end  
+    end  
+
+end
+
+})
+
+-- Toggle Float Button
+MainTab:Toggle({
+Title = "Float Auto Jump",
+Default = false,
+Callback = function(state)
+
+FloatingGui.Enabled = state  
+
+    if not state then  
+        autoJump = false  
+
+        if floatingJumpButton then  
+            floatingJumpButton.Text = "Auto Jump : OFF"  
+        end  
+    end  
+
+end
+
+})
+
+-- ระบบ Auto Jump
+RunService.RenderStepped:Connect(function()
+
+if autoJump then  
+
+	local char = player.Character  
+	if char then  
+
+		local hum = char:FindFirstChildOfClass("Humanoid")  
+
+		if hum then  
+			if hum.FloorMaterial ~= Enum.Material.Air then  
+				hum:ChangeState(Enum.HumanoidStateType.Jumping)  
+			end  
+		end  
+
+	end  
+
+end
+
+end)
+
+-- =========================
+-- Services & Player
+-- =========================
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
+local player = Players.LocalPlayer
+
+-- =========================
+-- Floating GUI
+-- =========================
+local FloatingGui = Instance.new("ScreenGui")
+FloatingGui.Name = "FloatingGui"
+FloatingGui.ResetOnSpawn = false
+FloatingGui.Parent = player:WaitForChild("PlayerGui")
+
+-- =====================
+-- HEAVY FPS LAG SYSTEM
+-- =====================
+local lagging = false
+local floatingLagButton
+
+local function lagFPSHeavy(time)
+	if lagging then return end
+	lagging = true
+
+	task.spawn(function()
+		local start = tick()
+		while tick() - start < time do
+			local t = {}
+			for i = 1, 4e6 do
+				t[i] = math.random()
+			end
+			RunService.Heartbeat:Wait()
+		end
+		lagging = false
+	end)
+end
+
+-- =========================
+-- ปุ่มลอย Lag Switch
+-- =========================
+local function createFloatingLagButton()
+	if floatingLagButton then return end
+
+	local btn = Instance.new("TextButton")
+	btn.Size = UDim2.new(0,140,0,52)
+	btn.Position = UDim2.new(0.5,-70,0.87,0)
+	btn.AnchorPoint = Vector2.new(0.5,0)
+	btn.BackgroundColor3 = Color3.fromRGB(180,220,255)
+	btn.BackgroundTransparency = 0.35
+	btn.TextColor3 = Color3.fromRGB(0,70,150)
+	btn.Text = "Lag Switch"
+	btn.Font = Enum.Font.GothamBold
+	btn.TextSize = 14
+	btn.Parent = FloatingGui
+	btn.Active = true
+	btn.Draggable = true
+
+	local corner = Instance.new("UICorner", btn)
+	corner.CornerRadius = UDim.new(0,18)
+
+	-- ขอบปุ่มจริง
+	local stroke = Instance.new("UIStroke", btn)
+	stroke.Thickness = 2.5
+	stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+	stroke.Color = Color3.fromRGB(0,120,255)
+
+	-- ไล่สีขอบ น้ำเงิน ↔ ฟ้าอ่อน
+	task.spawn(function()
+		while btn.Parent do
+			TweenService:Create(
+				stroke,
+				TweenInfo.new(0.8, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut),
+				{Color = Color3.fromRGB(0,80,255)}
+			):Play()
+			task.wait(0.8)
+			TweenService:Create(
+				stroke,
+				TweenInfo.new(0.8, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut),
+				{Color = Color3.fromRGB(160,230,255)}
+			):Play()
+			task.wait(0.8)
+		end
+	end)
+
+	btn.MouseButton1Click:Connect(function()
+		lagFPSHeavy(0.5)
+	end)
+
+	floatingLagButton = btn
+end
+
+local function removeFloatingLagButton()
+	if floatingLagButton then
+		floatingLagButton:Destroy()
+		floatingLagButton = nil
+	end
+end
+
+-- =========================
+-- ปุ่มในเมนูหลัก
+-- =========================
+MainTab:Button({
+	Title = "Lag Switch ",
+	Desc = "FPS -1 ",
+	Callback = function()
+		lagFPSHeavy(0.5)
+	end
+})
+
+MainTab:Toggle({
+	Title = "Lag Switch (float)",
+	Desc = "Floating button",
+	Value = false,
+	Callback = function(v)
+		if v then
+			createFloatingLagButton()
+		else
+			removeFloatingLagButton()
+		end
+	end
+})
+
+-- =========================
+-- AUTO BOUNCE SYSTEM
+-- =========================
+local autoBounce = false
+local floatingBounceButton
+local bouncePower = 150
+local groundCheckDistance = 8
+
+task.spawn(function()
+	while true do
+		RunService.Heartbeat:Wait()
+		if not autoBounce then continue end
+
+		local char = player.Character
+		if not char then continue end
+
+		local root = char:FindFirstChild("HumanoidRootPart")
+		local humanoid = char:FindFirstChildOfClass("Humanoid")
+		if not root or not humanoid then continue end
+
+		local rayOrigin = root.Position
+		local rayDirection = Vector3.new(0, -groundCheckDistance, 0)
+		local params = RaycastParams.new()
+		params.FilterDescendantsInstances = {char}
+		params.FilterType = Enum.RaycastFilterType.Blacklist
+
+		local ray = workspace:Raycast(rayOrigin, rayDirection, params)
+
+		if ray and root.Velocity.Y < 0 then
+			root.Velocity = Vector3.new(root.Velocity.X, bouncePower, root.Velocity.Z)
+		end
+	end
+end)
+
+-- =========================
+-- Floating Auto Bounce Button
+-- =========================
+local function createFloatingBounceButton()
+	if floatingBounceButton then return end
+
+	local btn = Instance.new("TextButton")
+	btn.Size = UDim2.new(0,140,0,52)
+	btn.Position = UDim2.new(0.5,-70,0.78,0)
+	btn.AnchorPoint = Vector2.new(0.5,0)
+	btn.BackgroundColor3 = Color3.fromRGB(180,220,255)
+	btn.BackgroundTransparency = 0.35
+	btn.TextColor3 = Color3.fromRGB(0,70,150)
+	btn.Text = "Auto Bounce : OFF"
+	btn.Font = Enum.Font.GothamBold
+	btn.TextSize = 14
+	btn.Parent = FloatingGui
+	btn.Active = true
+	btn.Draggable = true
+
+	local corner = Instance.new("UICorner", btn)
+	corner.CornerRadius = UDim.new(0,18)
+
+	local stroke = Instance.new("UIStroke", btn)
+	stroke.Thickness = 2.5
+	stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+	stroke.Color = Color3.fromRGB(0,120,255)
+
+	task.spawn(function()
+		while btn.Parent do
+			TweenService:Create(
+				stroke,
+				TweenInfo.new(0.8, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut),
+				{Color = Color3.fromRGB(0,80,255)}
+			):Play()
+			task.wait(0.8)
+			TweenService:Create(
+				stroke,
+				TweenInfo.new(0.8, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut),
+				{Color = Color3.fromRGB(160,230,255)}
+			):Play()
+			task.wait(0.8)
+		end
+	end)
+
+	btn.MouseButton1Click:Connect(function()
+		autoBounce = not autoBounce
+		btn.Text = autoBounce and "Auto Bounce : ON" or "Auto Bounce : OFF"
+	end)
+
+	floatingBounceButton = btn
+end
+
+local function removeFloatingBounceButton()
+	if floatingBounceButton then
+		floatingBounceButton:Destroy()
+		floatingBounceButton = nil
+	end
+end
+
+-- =========================
+-- Main Menu Buttons
+-- =========================
+MainTab:Toggle({
+	Title = "Auto Bounce (Normal)",
+	Desc = "Fall from height → Bounce up 150",
+	Value = false,
+	Callback = function(v)
+		autoBounce = v
+	end
+})
+
+MainTab:Toggle({
+	Title = "Auto Bounce (Floating Button)",
+	Desc = "Light blue floating button with animated blue border",
+	Value = false,
+	Callback = function(v)
+		if v then
+			createFloatingBounceButton()
+		else
+			removeFloatingBounceButton()
+			autoBounce = false
+		end
+	end
+})
+
+-- =========================
+-- Services
+-- =========================
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local player = Players.LocalPlayer
+
+-- =========================
+-- Auto Respawn Settings
+-- =========================
+getgenv().AutoRespawnEnabled = false
+local autoRespawnMethod = "Fake Revive"
+local lastSavedPosition
+local floatingRespawnButton
+
+-- =========================
+-- Setup Auto Respawn Function
+-- =========================
+local function setupAutoRevive(character)
+    task.defer(function()
+        character:WaitForChild("HumanoidRootPart",5)
+        character:WaitForChild("Humanoid",5)
+        
+        -- Save last position
+        task.spawn(function()
+            while character and character.Parent do
+                local hrp = character:FindFirstChild("HumanoidRootPart")
+                if hrp then
+                    character:SetAttribute("LastPosition", hrp.Position)
+                end
+                task.wait(0.2)
+            end
+        end)
+
+        -- Detect Downed state
+        character:GetAttributeChangedSignal("Downed"):Connect(function()
+            if not getgenv().AutoRespawnEnabled then return end
+            if character:GetAttribute("Downed") ~= true then return end
+            if autoRespawnMethod ~= "Fake Revive" then return end
+
+            local hrp = character:FindFirstChild("HumanoidRootPart")
+            if hrp then lastSavedPosition = hrp.Position end
+
+            task.wait(0.5)
+
+            -- Instant respawn
+            local start = tick()
+            repeat
+                pcall(function()
+                    game:GetService("ReplicatedStorage"):WaitForChild("Events",9e9)
+                        :WaitForChild("Player",9e9)
+                        :WaitForChild("ChangePlayerMode",9e9)
+                        :FireServer(true)
+                end)
+                task.wait(0.5)
+            until character:GetAttribute("Downed") ~= true or tick() - start > 2
+
+            local newChar
+            repeat
+                newChar = player.Character
+                task.wait()
+            until newChar and newChar:FindFirstChild("HumanoidRootPart")
+
+            local newHRP = newChar:FindFirstChild("HumanoidRootPart")
+            if lastSavedPosition and newHRP then
+                newHRP.CFrame = CFrame.new(lastSavedPosition)
+            end
+        end)
+    end)
+end
+
+-- Setup for current and new characters
+if player.Character then setupAutoRevive(player.Character) end
+player.CharacterAdded:Connect(setupAutoRevive)
+
+-- =========================
+-- Floating Button Function
+-- =========================
+local function createRespawnFloatingButton()
+	if floatingRespawnButton then return end
+
+	local btn = Instance.new("TextButton")
+	btn.Size = UDim2.new(0,140,0,50)
+	btn.Position = UDim2.new(0.8,0,0.8,0)
+	btn.AnchorPoint = Vector2.new(0.5,0)
+	btn.BackgroundColor3 = Color3.fromRGB(180,220,255)
+	btn.BackgroundTransparency = 0.3
+	btn.TextColor3 = Color3.fromRGB(0,0,150)
+	btn.Font = Enum.Font.GothamBold
+	btn.Text = "Auto Respawn : OFF"
+	btn.TextSize = 14
+	btn.Parent = FloatingGui
+	btn.Active = true
+	btn.Draggable = true
+
+	-- Rounded corners
+	local corner = Instance.new("UICorner", btn)
+	corner.CornerRadius = UDim.new(0,18)
+
+	-- Animated border
+	local stroke = Instance.new("UIStroke", btn)
+	stroke.Thickness = 2.5
+	stroke.Color = Color3.fromRGB(0,120,255)
+	stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+
+	-- Color tween animation
+	task.spawn(function()
+		while btn.Parent do
+			TweenService:Create(
+				stroke,
+				TweenInfo.new(0.8, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, true),
+				{Color = Color3.fromRGB(0,180,255)}
+			):Play()
+			task.wait(0.8)
+			TweenService:Create(
+				stroke,
+				TweenInfo.new(0.8, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, true),
+				{Color = Color3.fromRGB(0,120,255)}
+			):Play()
+			task.wait(0.8)
+		end
+	end)
+
+	-- Button click
+	btn.MouseButton1Click:Connect(function()
+		getgenv().AutoRespawnEnabled = not getgenv().AutoRespawnEnabled
+		btn.Text = getgenv().AutoRespawnEnabled and "Auto Respawn : ON" or "Auto Respawn : OFF"
+		btn.BackgroundColor3 = getgenv().AutoRespawnEnabled and Color3.fromRGB(80,255,80) or Color3.fromRGB(180,220,255)
+		btn.TextColor3 = getgenv().AutoRespawnEnabled and Color3.fromRGB(0,0,0) or Color3.fromRGB(0,0,150)
+
+		if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+			local root = player.Character.HumanoidRootPart
+			root.Velocity = Vector3.new(root.Velocity.X, 50, root.Velocity.Z)
+		end
+	end)
+
+	floatingRespawnButton = btn
+end
+
+local function removeRespawnFloatingButton()
+	if floatingRespawnButton then
+		floatingRespawnButton:Destroy()
+		floatingRespawnButton = nil
+	end
+end
+
+-- =========================
+-- Normal Toggle in MainTab
+-- =========================
+MainTab:Toggle({
+	Title = "Auto Respawn (Normal)",
+	Desc = "Automatically respawn until turned off",
+	Value = false,
+	Callback = function(state)
+		getgenv().AutoRespawnEnabled = state
+		if state then
+			if player.Character then setupAutoRevive(player.Character) end
+		end
+	end
+})
+
+-- =========================
+-- Floating Button Toggle
+-- =========================
+MainTab:Toggle({
+	Title = "Auto Respawn (Floating Button)",
+	Desc = "Light blue floating button with animated blue border",
+	Value = false,
+	Callback = function(state)
+		if state then
+			createRespawnFloatingButton()
+		else
+			removeRespawnFloatingButton()
+			getgenv().AutoRespawnEnabled = false
+		end
+	end
+})
+
+-- =========================
+-- Teleport Roof
+-- =========================
+
+TeleportTab:Button({
+    Title = "Teleport Roof",
+    Desc = "Teleport 1300 studs upward",
+    Callback = function()
+
+        local player = game.Players.LocalPlayer
+        local char = player.Character or player.CharacterAdded:Wait()
+        local root = char:FindFirstChild("HumanoidRootPart")
+
+        if root then
+            root.CFrame = root.CFrame + Vector3.new(0,1300,0)
+        end
+
+    end
+})
+
+-- =========================
+-- Floating Teleport Roof Button
+-- =========================
+
+local floatingRoofButton
+
+local function createFloatingRoofButton()
+
+    if floatingRoofButton then return end
+
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0,140,0,52)
+    btn.Position = UDim2.new(0.5,-70,0.70,0)
+    btn.AnchorPoint = Vector2.new(0.5,0)
+    btn.BackgroundColor3 = Color3.fromRGB(180,220,255)
+    btn.BackgroundTransparency = 0.35
+    btn.TextColor3 = Color3.fromRGB(0,70,150)
+    btn.Text = "Teleport Roof"
+    btn.Font = Enum.Font.GothamBold
+    btn.TextSize = 14
+    btn.Parent = FloatingGui
+    btn.Active = true
+    btn.Draggable = true
+
+    local corner = Instance.new("UICorner",btn)
+    corner.CornerRadius = UDim.new(0,18)
+
+    local stroke = Instance.new("UIStroke",btn)
+    stroke.Thickness = 2.5
+    stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    stroke.Color = Color3.fromRGB(0,120,255)
+
+    btn.MouseButton1Click:Connect(function()
+
+        local player = game.Players.LocalPlayer
+        local char = player.Character
+        if not char then return end
+
+        local root = char:FindFirstChild("HumanoidRootPart")
+        if root then
+            root.CFrame = root.CFrame + Vector3.new(0,1300,0)
+        end
+
+    end)
+
+    floatingRoofButton = btn
+
+end
+
+
+local function removeFloatingRoofButton()
+    if floatingRoofButton then
+        floatingRoofButton:Destroy()
+        floatingRoofButton = nil
+    end
+end
+
+
+TeleportTab:Toggle({
+    Title = "Teleport Roof (Floating Button)",
+    Desc = "Floating button to teleport up 1300",
+    Value = false,
+    Callback = function(v)
+
+        if v then
+            createFloatingRoofButton()
+        else
+            removeFloatingRoofButton()
+        end
+
+    end
+})
+
+-- =========================
+-- TP Downed Player System
+-- =========================
+
+local floatingDownedButton
+
+local function teleportToDowned()
+
+    local myChar = player.Character
+    if not myChar then return end
+
+    local myRoot = myChar:FindFirstChild("HumanoidRootPart")
+    if not myRoot then return end
+
+    local originalPos = myRoot.CFrame
+    local targetRoot = nil
+
+    -- หา player ที่ Downed หรือเลือด 0
+    for _,plr in pairs(game.Players:GetPlayers()) do
+        if plr ~= player and plr.Character then
+
+            local hum = plr.Character:FindFirstChildOfClass("Humanoid")
+            local root = plr.Character:FindFirstChild("HumanoidRootPart")
+
+            if hum and root then
+                if hum.Health <= 0 or plr.Character:GetAttribute("Downed") == true then
+                    targetRoot = root
+                    break
+                end
+            end
+
+        end
+    end
+
+    -- ถ้าเจอ
+    if targetRoot then
+
+        myRoot.CFrame = targetRoot.CFrame + Vector3.new(0,3,0)
+
+        task.wait(2)
+
+        if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            player.Character.HumanoidRootPart.CFrame = originalPos
+        end
+
+    end
+end
+
+-- =========================
+-- ปุ่มใน Teleport Tab
+-- =========================
+
+TeleportTab:Button({
+    Title = "TP Downed",
+    Desc = "Teleport to downed player for 2 seconds",
+    Callback = function()
+        teleportToDowned()
+    end
+})
+
+-- =========================
+-- Floating Button
+-- =========================
+
+local function createFloatingDownedButton()
+
+    if floatingDownedButton then return end
+
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0,140,0,52)
+    btn.Position = UDim2.new(0.5,-70,0.64,0)
+    btn.AnchorPoint = Vector2.new(0.5,0)
+    btn.BackgroundColor3 = Color3.fromRGB(180,220,255)
+    btn.BackgroundTransparency = 0.35
+    btn.TextColor3 = Color3.fromRGB(0,70,150)
+    btn.Text = "TP Downed"
+    btn.Font = Enum.Font.GothamBold
+    btn.TextSize = 14
+    btn.Parent = FloatingGui
+    btn.Active = true
+    btn.Draggable = true
+
+    local corner = Instance.new("UICorner",btn)
+    corner.CornerRadius = UDim.new(0,18)
+
+    local stroke = Instance.new("UIStroke",btn)
+    stroke.Thickness = 2.5
+    stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    stroke.Color = Color3.fromRGB(0,120,255)
+
+    btn.MouseButton1Click:Connect(function()
+        teleportToDowned()
+    end)
+
+    floatingDownedButton = btn
+
+end
+
+local function removeFloatingDownedButton()
+
+    if floatingDownedButton then
+        floatingDownedButton:Destroy()
+        floatingDownedButton = nil
+    end
+
+end
+
+-- =========================
+-- Toggle Floating Button
+-- =========================
+
+TeleportTab:Toggle({
+    Title = "TP Downed (Floating)",
+    Desc = "Floating teleport to downed player",
+    Value = false,
+    Callback = function(v)
+
+        if v then
+            createFloatingDownedButton()
+        else
+            removeFloatingDownedButton()
+        end
+
+    end
+})
+
+-- =========================
+-- WALL HACK SYSTEM
+-- =========================
+
+local wallHack = false
+local floatingWallButton
+
+-- ระบบทะลุกำแพง
+RunService.Stepped:Connect(function()
+
+    if wallHack and player.Character then
+
+        for _,part in pairs(player.Character:GetDescendants()) do
+            if part:IsA("BasePart") then
+                part.CanCollide = false
+            end
+        end
+
+    end
+
+end)
+
+-- =========================
+-- ปุ่มใน ExtraTab
+-- =========================
+
+ExtraTab:Toggle({
+    Title = "Wall Hack",
+    Desc = "Walk through red walls",
+    Value = false,
+    Callback = function(v)
+        wallHack = v
+    end
+})
+
+-- =========================
+-- Floating Button
+-- =========================
+
+local function createFloatingWallButton()
+
+    if floatingWallButton then return end
+
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0,140,0,52)
+    btn.Position = UDim2.new(0.5,-70,0.58,0)
+    btn.AnchorPoint = Vector2.new(0.5,0)
+    btn.BackgroundColor3 = Color3.fromRGB(180,220,255)
+    btn.BackgroundTransparency = 0.35
+    btn.TextColor3 = Color3.fromRGB(0,70,150)
+    btn.Text = "Wall Hack : OFF"
+    btn.Font = Enum.Font.GothamBold
+    btn.TextSize = 14
+    btn.Parent = FloatingGui
+    btn.Active = true
+    btn.Draggable = true
+
+    local corner = Instance.new("UICorner",btn)
+    corner.CornerRadius = UDim.new(0,18)
+
+    local stroke = Instance.new("UIStroke",btn)
+    stroke.Thickness = 2.5
+    stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    stroke.Color = Color3.fromRGB(0,120,255)
+
+    btn.MouseButton1Click:Connect(function()
+
+        wallHack = not wallHack
+        btn.Text = wallHack and "Wall Hack : ON" or "Wall Hack : OFF"
+
+    end)
+
+    floatingWallButton = btn
+
+end
+
+local function removeFloatingWallButton()
+
+    if floatingWallButton then
+        floatingWallButton:Destroy()
+        floatingWallButton = nil
+    end
+
+end
+
+-- =========================
+-- Toggle Floating
+-- =========================
+
+ExtraTab:Toggle({
+    Title = "Wall Hack (Floating)",
+    Desc = "Floating wall hack button",
+    Value = false,
+    Callback = function(v)
+
+        if v then
+            createFloatingWallButton()
+        else
+            removeFloatingWallButton()
+            wallHack = false
+        end
+
+    end
+})
+
+-- =========================
+-- TP TO PLAYER SYSTEM
+-- =========================
+
+local selectedPlayer = nil
+local floatingTPPlayerButton
+
+local playerList = {}
+
+local function updatePlayerList()
+
+	playerList = {}
+
+	for _,plr in pairs(game.Players:GetPlayers()) do
+		if plr ~= player then
+			table.insert(playerList, plr.Name)
+		end
+	end
+
+end
+
+updatePlayerList()
+
+-- =========================
+-- Teleport Function
+-- =========================
+
+local function teleportToPlayer(name)
+
+	if not name then return end
+
+	local target = game.Players:FindFirstChild(name)
+	if not target then return end
+
+	if not target.Character then return end
+
+	local targetRoot = target.Character:FindFirstChild("HumanoidRootPart")
+	if not targetRoot then return end
+
+	local myChar = player.Character
+	if not myChar then return end
+
+	local myRoot = myChar:FindFirstChild("HumanoidRootPart")
+	if not myRoot then return end
+
+	myRoot.CFrame = targetRoot.CFrame + Vector3.new(0,3,0)
+
+end
+
+-- =========================
+-- Dropdown Player Select
+-- =========================
+
+local playerDropdown = TeleportTab:Dropdown({
+	Title = "TP To Player",
+	Values = playerList,
+	Multi = false,
+	AllowNone = true,
+	Callback = function(name)
+
+		selectedPlayer = name
+
+	end
+})
+
+-- =========================
+-- Normal Button
+-- =========================
+
+TeleportTab:Button({
+	Title = "TP Selected Player",
+	Desc = "Teleport to selected player",
+	Callback = function()
+
+		if selectedPlayer then
+			teleportToPlayer(selectedPlayer)
+		end
+
+	end
+})
+
+-- =========================
+-- Floating Button
+-- =========================
+
+local function createFloatingTPPlayerButton()
+
+	if floatingTPPlayerButton then return end
+
+	local btn = Instance.new("TextButton")
+	btn.Size = UDim2.new(0,140,0,52)
+	btn.Position = UDim2.new(0.5,-70,0.52,0)
+	btn.AnchorPoint = Vector2.new(0.5,0)
+	btn.BackgroundColor3 = Color3.fromRGB(180,220,255)
+	btn.BackgroundTransparency = 0.35
+	btn.TextColor3 = Color3.fromRGB(0,70,150)
+	btn.Text = "TP Player"
+	btn.Font = Enum.Font.GothamBold
+	btn.TextSize = 14
+	btn.Parent = FloatingGui
+	btn.Active = true
+	btn.Draggable = true
+
+	local corner = Instance.new("UICorner",btn)
+	corner.CornerRadius = UDim.new(0,18)
+
+	local stroke = Instance.new("UIStroke",btn)
+	stroke.Thickness = 2.5
+	stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+	stroke.Color = Color3.fromRGB(0,120,255)
+
+	btn.MouseButton1Click:Connect(function()
+
+		if selectedPlayer then
+			teleportToPlayer(selectedPlayer)
+		end
+
+	end)
+
+	floatingTPPlayerButton = btn
+
+end
+
+local function removeFloatingTPPlayerButton()
+
+	if floatingTPPlayerButton then
+		floatingTPPlayerButton:Destroy()
+		floatingTPPlayerButton = nil
+	end
+
+end
+
+-- =========================
+-- Floating Toggle
+-- =========================
+
+TeleportTab:Toggle({
+	Title = "TP Player (Floating)",
+	Desc = "Floating teleport button",
+	Value = false,
+	Callback = function(v)
+
+		if v then
+			createFloatingTPPlayerButton()
+		else
+			removeFloatingTPPlayerButton()
+		end
+
+	end
+})
+
+-- =========================
+-- Update Player List
+-- =========================
+
+game.Players.PlayerAdded:Connect(function()
+
+	updatePlayerList()
+	playerDropdown:Refresh(playerList)
+
+end)
+
+game.Players.PlayerRemoving:Connect(function()
+
+	updatePlayerList()
+	playerDropdown:Refresh(playerList)
+
+end)
+
+-- =========================
+-- Delete Wall Invisible
+-- =========================
+
+local floatingDeleteInvis = nil
+local floatingDeleteEnabled = false
+
+local function deleteInvisParts()
+	for _,v in pairs(workspace:GetDescendants()) do
+		if string.find(v.Name:lower(),"invisparts") then
+			v:Destroy()
+		end
+	end
+end
+
+-- ปุ่มกดใน MainTab
+MainTab:Button({
+	Title = "Delete Wall Invisible",
+	Callback = function()
+		deleteInvisParts()
+	end
+})
+
+-- =========================
+-- ปุ่มลอย
+-- =========================
+local function createFloatingDeleteInvis()
+	if floatingDeleteInvis then return end
+
+	local btn = Instance.new("TextButton")
+	btn.Size = UDim2.new(0,200,0,200)
+	btn.Position = UDim2.new(0.8,0,0.6,0)
+	btn.AnchorPoint = Vector2.new(0.5,0.5)
+	btn.BackgroundColor3 = Color3.fromRGB(180,220,255)
+	btn.BackgroundTransparency = 0.35
+	btn.TextColor3 = Color3.fromRGB(0,70,150)
+	btn.Text = "Delete\nInvis"
+	btn.Font = Enum.Font.GothamBold
+	btn.TextSize = 22
+	btn.Parent = FloatingGui
+	btn.Active = true
+	btn.Draggable = true
+
+	local corner = Instance.new("UICorner",btn)
+	corner.CornerRadius = UDim.new(1,0)
+
+	local stroke = Instance.new("UIStroke",btn)
+	stroke.Thickness = 4
+	stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+	stroke.Color = Color3.fromRGB(80,170,255)
+
+	task.spawn(function()
+		while btn.Parent do
+			TweenService:Create(
+				stroke,
+				TweenInfo.new(0.9,Enum.EasingStyle.Sine,Enum.EasingDirection.InOut),
+				{Color = Color3.fromRGB(0,90,255)}
+			):Play()
+			task.wait(0.9)
+
+			TweenService:Create(
+				stroke,
+				TweenInfo.new(0.9,Enum.EasingStyle.Sine,Enum.EasingDirection.InOut),
+				{Color = Color3.fromRGB(150,230,255)}
+			):Play()
+			task.wait(0.9)
+		end
+	end)
+
+	btn.MouseButton1Click:Connect(function()
+		deleteInvisParts()
+	end)
+
+	floatingDeleteInvis = btn
+end
+
+-- =========================
+-- เปิด / ปิด ปุ่มลอย
+-- =========================
+MainTab:Toggle({
+	Title = "Float Delete Invis",
+	Default = false,
+	Callback = function(state)
+		floatingDeleteEnabled = state
+
+		if state then
+			createFloatingDeleteInvis()
+			if floatingDeleteInvis then
+				floatingDeleteInvis.Visible = true
+			end
+		else
+			if floatingDeleteInvis then
+				floatingDeleteInvis.Visible = false
+			end
+		end
+	end
+})
+
+-- =========================
+-- Moon Mod
+-- =========================
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+local moonEnabled = false
+local floatingMoonButton = nil
+
+local function applyMoon()
+local char = player.Character
+if char then
+if moonEnabled then
+workspace.Gravity = 35 -- ยิ่งน้อยยิ่งตกช้า
+else
+workspace.Gravity = 196.2
+end
+end
+end
+
+player.CharacterAdded:Connect(function()
+task.wait(1)
+applyMoon()
+end)
+
+-- =========================
+-- Toggle Moon Mod
+-- =========================
+ExtraTab:Toggle({
+Title = "Moon Mod",
+Default = false,
+Callback = function(state)
+moonEnabled = state
+applyMoon()
+end
+})
+
+-- =========================
+-- สร้างปุ่มลอย
+-- =========================
+local function createFloatingMoonButton()
+if floatingMoonButton then return end
+
+local btn = Instance.new("TextButton")  
+btn.Size = UDim2.new(0,200,0,200)  
+btn.Position = UDim2.new(0.75,0,0.35,0)  
+btn.AnchorPoint = Vector2.new(0.5,0.5)  
+btn.BackgroundColor3 = Color3.fromRGB(180,220,255)  
+btn.BackgroundTransparency = 0.35  
+btn.TextColor3 = Color3.fromRGB(0,70,150)  
+btn.Text = "Moon\nMod"  
+btn.Font = Enum.Font.GothamBold  
+btn.TextSize = 22  
+btn.Parent = FloatingGui  
+btn.Active = true  
+btn.Draggable = true  
+
+local corner = Instance.new("UICorner",btn)  
+corner.CornerRadius = UDim.new(1,0)  
+
+local stroke = Instance.new("UIStroke",btn)  
+stroke.Thickness = 4  
+stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border  
+stroke.Color = Color3.fromRGB(80,170,255)  
+
+task.spawn(function()  
+	while btn.Parent do  
+		TweenService:Create(  
+			stroke,  
+			TweenInfo.new(0.9,Enum.EasingStyle.Sine,Enum.EasingDirection.InOut),  
+			{Color = Color3.fromRGB(0,90,255)}  
+		):Play()  
+		task.wait(0.9)  
+
+		TweenService:Create(  
+			stroke,  
+			TweenInfo.new(0.9,Enum.EasingStyle.Sine,Enum.EasingDirection.InOut),  
+			{Color = Color3.fromRGB(150,230,255)}  
+		):Play()  
+		task.wait(0.9)  
+	end  
+end)  
+
+btn.MouseButton1Click:Connect(function()  
+	moonEnabled = not moonEnabled  
+	applyMoon()  
+end)  
+
+floatingMoonButton = btn
+
+end
+
+-- =========================
+-- Toggle เปิดปุ่มลอย
+-- =========================
+ExtraTab:Toggle({
+Title = "Float Moon Mod",
+Default = false,
+Callback = function(state)
+if state then
+createFloatingMoonButton()
+if floatingMoonButton then
+floatingMoonButton.Visible = true
+end
+else
+if floatingMoonButton then
+floatingMoonButton.Visible = false
+end
+end
+end
+})
+
+-- =========================
+-- Map Spawner System
+-- =========================
+local currentMap = nil
+
+local function spawnMap(assetId,height)
+
+    local Players = game:GetService("Players")
+    local player = Players.LocalPlayer
+    local char = player.Character or player.CharacterAdded:Wait()
+    local hrp = char:WaitForChild("HumanoidRootPart")
+
+    -- ลบแมพเก่า
+    if currentMap and currentMap.Parent then
+        currentMap:Destroy()
+        currentMap = nil
+    end
+
+    -- โหลดแมพใหม่
+    local model = game:GetObjects("rbxassetid://"..assetId)[1]
+    model.Parent = workspace
+    currentMap = model
+
+    local cf = model:GetPivot()
+    model:PivotTo(cf + Vector3.new(0,height,0))
+
+    task.wait(0.2)
+
+    hrp.CFrame = model:GetPivot() * CFrame.new(0,3,0)
+end
+
+-- =========================
+-- Map: Grow a Garden
+-- =========================
+MapTab:Button({
+    Title = "Map: Grow a Garden",
+    Callback = function()
+        spawnMap(105019154044298,270)
+    end
+})
+
+-- =========================
+-- Map: Brookhaven
+-- =========================
+MapTab:Button({
+    Title = "Map: Brookhaven",
+    Callback = function()
+        spawnMap(129684332192788,250)
+    end
+})
+
+-- =========================
+-- Map: Free Fire
+-- =========================
+MapTab:Button({
+    Title = "Map: Free Fire",
+    Callback = function()
+        spawnMap(136952494452456,250)
+    end
+})
+
+-- =========================
+-- Smooth Dash (Air Smooth Fix)
+-- =========================
+local dashEnabled = false
+local dashSpeed = 50
+local floatingDashButton
+local dashVelocity = nil
+
+-- Start Dash
+local function startDash()
+    if dashVelocity then return end
+    local char = player.Character
+    if not char then return end
+    local root = char:FindFirstChild("HumanoidRootPart")
+    if not root then return end
+
+    dashVelocity = Instance.new("BodyVelocity")
+    dashVelocity.MaxForce = Vector3.new(400000,0,400000)
+    dashVelocity.P = 1250
+    dashVelocity.Parent = root
+
+    task.spawn(function()
+        while dashEnabled and dashVelocity and dashVelocity.Parent do
+            local cam = workspace.CurrentCamera
+            if cam and root then
+                local dir = cam.CFrame.LookVector
+                dir = Vector3.new(dir.X,0,dir.Z)
+                if dir.Magnitude > 0 then
+                    dir = dir.Unit
+                end
+                dashVelocity.Velocity = dir * dashSpeed
+            end
+            task.wait(0.03)
+        end
+
+        if dashVelocity then
+            dashVelocity:Destroy()
+            dashVelocity = nil
+        end
+    end)
+end
+
+-- =========================
+-- GUI Toggle
+SettingsTab:Toggle({
+    Title="Smooth Dash",
+    Desc="Dash forward smoothly based on camera direction",
+    Value=false,
+    Callback=function(state)
+        dashEnabled = state
+        if state then
+            startDash()
+        elseif dashVelocity then
+            dashVelocity:Destroy()
+            dashVelocity = nil
+        end
+    end
+})
+
+-- =========================
+-- WindUI Speed Input
+WindTab:Input({
+    Title="Dash Speed",
+    Placeholder=tostring(dashSpeed),
+    Callback=function(text)
+        local num = tonumber(text)
+        if num then
+            dashSpeed = num
+        end
+    end
+})
+
+-- =========================
+-- Floating Button
+local function createFloatingDashButton()
+    if floatingDashButton then return end
+
+    floatingDashButton = Instance.new("TextButton")
+    floatingDashButton.Size = UDim2.new(0,120,0,50)
+    floatingDashButton.Position = UDim2.new(0.5,-60,0.3,0)
+    floatingDashButton.AnchorPoint = Vector2.new(0.5,0)
+    floatingDashButton.BackgroundColor3 = Color3.fromRGB(0,170,255)
+    floatingDashButton.TextColor3 = Color3.fromRGB(255,255,255)
+    floatingDashButton.Text = dashEnabled and "Dash: ON" or "Dash: OFF"
+    floatingDashButton.Parent = FloatingGui
+    floatingDashButton.Active = true
+    floatingDashButton.Draggable = true
+
+    floatingDashButton.MouseButton1Click:Connect(function()
+        dashEnabled = not dashEnabled
+        floatingDashButton.Text = dashEnabled and "Dash: ON" or "Dash: OFF"
+
+        if dashEnabled then
+            startDash()
+        elseif dashVelocity then
+            dashVelocity:Destroy()
+            dashVelocity = nil
+        end
+    end)
+end
+
+-- =========================
+-- Floating Button Toggle
+SettingsTab:Toggle({
+    Title="Float Smooth Dash",
+    Desc="Show floating button for Smooth Dash",
+    Value=false,
+    Callback=function(state)
+
+        if state then
+            createFloatingDashButton()
+
+        else
+            if floatingDashButton then
+                floatingDashButton:Destroy()
+                floatingDashButton = nil
+            end
+
+            dashEnabled = false
+
+            if dashVelocity then
+                dashVelocity:Destroy()
+                dashVelocity = nil
+            end
+        end
+
+    end
+})
