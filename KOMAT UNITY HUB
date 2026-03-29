@@ -1490,6 +1490,13 @@ SettingsTab:Toggle({
     end
 })
 
+VisualsTab:Button({
+    Title = "Test",
+    Callback = function()
+        print("กูอยู่เว้ย")
+    end
+})
+
 -- ESP SYSTEM
 local espEnabled = false
 local espCache = {}
