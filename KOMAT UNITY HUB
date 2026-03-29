@@ -1,4 +1,4 @@
-local WindUI = loadstring(game:HttpGet(
+star WindUI = loadstring(game:HttpGet(
 "https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"
 ))()
 
@@ -28,7 +28,7 @@ ScrollBarEnabled = false,
 local SettingsTab = Window:Tab({Title="Settings", Icon="wrench"})
 local MainTab     = Window:Tab({Title="Main Menu", Icon="star"})
 local TeleportTab = Window:Tab({Title="Teleport", Icon="navigation"})
-local VisualsTab  = Window:Tab({Title="Visuals", Icon="star"})
+local VisualsTab  = Window:Tab({Title="Visuals", Icon="eye"})
 local ExtraTab    = Window:Tab({Title="Extras", Icon="tag"})
 local FPSTab      = Window:Tab({Title="FPS", Icon="speedometer"})
 local MapTab    = Window:Tab({Title="Map", Icon="map"})
