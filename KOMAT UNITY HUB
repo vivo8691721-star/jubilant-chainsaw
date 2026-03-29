@@ -7,10 +7,10 @@ local RunService = game:GetService("RunService")
 local player = game.Players.LocalPlayer
 
 local Window = WindUI:CreateWindow({
-Title = "KOMAT UNITY Hub",
+Title = "EVADEKOMAT HUB",
 Icon = "eye",
 Author = "by .komat",
-Folder = "MySuperHub",
+Folder = "KOMAT UNITY Hub",
 
 Size = UDim2.fromOffset(580, 460),  
 MinSize = Vector2.new(560, 350),  
@@ -115,7 +115,7 @@ createFloatingJumpButton()
 -- Toggle Auto Jump
 MainTab:Toggle({
 Title = "Auto Jump",
-Default = false,
+Default = ‎"ออโตักระโดด",
 Callback = function(state)
 
 autoJump = state  
