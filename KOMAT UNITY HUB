@@ -1490,31 +1490,27 @@ SettingsTab:Toggle({
     end
 })
 
+-- ESP SYSTEM
 local espEnabled = false
 local espCache = {}
 
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
--- 🧠 สร้าง ESP
 local function addESP(plr)
     if plr == LocalPlayer then return end
     if espCache[plr] then return end
 
     local function apply(char)
         if not espEnabled then return end
-        if not char then return end
 
-        -- 🔲 Highlight (ทะลุกำแพง)
         local hl = Instance.new("Highlight")
         hl.Name = "ESP_Highlight"
         hl.FillTransparency = 1
         hl.OutlineColor = Color3.fromRGB(255,255,255)
-        hl.OutlineTransparency = 0
-        hl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop -- 🔥 เห็นทะลุ
+        hl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
         hl.Parent = char
 
-        -- 🏷️ ชื่อบนหัว
         local head = char:FindFirstChild("Head")
         if head then
             local gui = Instance.new("BillboardGui")
@@ -1529,18 +1525,15 @@ local function addESP(plr)
             text.BackgroundTransparency = 1
             text.Text = plr.Name
             text.TextColor3 = Color3.fromRGB(255,255,255)
-            text.TextStrokeTransparency = 0
             text.TextScaled = true
             text.Parent = gui
         end
     end
 
-    -- ตอนมีตัวละคร
     if plr.Character then
         apply(plr.Character)
     end
 
-    -- ตอนเกิดใหม่
     plr.CharacterAdded:Connect(function(char)
         task.wait(0.5)
         apply(char)
@@ -1549,7 +1542,6 @@ local function addESP(plr)
     espCache[plr] = true
 end
 
--- ❌ ลบ ESP
 local function removeESP(plr)
     if plr.Character then
         for _,v in pairs(plr.Character:GetDescendants()) do
@@ -1561,7 +1553,7 @@ local function removeESP(plr)
     espCache[plr] = nil
 end
 
--- 🔘 Toggle
+-- 🔘 ปุ่มมันอยู่นี่เว้ยยย
 VisualsTab:Toggle({
     Title = "ESP Player",
     Default = false,
@@ -1569,12 +1561,10 @@ VisualsTab:Toggle({
         espEnabled = state
 
         if state then
-            -- ใส่ให้ทุกคน
             for _,plr in pairs(Players:GetPlayers()) do
                 addESP(plr)
             end
 
-            -- คนเข้าใหม่
             Players.PlayerAdded:Connect(function(plr)
                 task.wait(0.5)
                 if espEnabled then
@@ -1582,13 +1572,10 @@ VisualsTab:Toggle({
                 end
             end)
 
-            -- คนออก
             Players.PlayerRemoving:Connect(function(plr)
                 removeESP(plr)
             end)
-
         else
-            -- ลบหมด
             for _,plr in pairs(Players:GetPlayers()) do
                 removeESP(plr)
             end
