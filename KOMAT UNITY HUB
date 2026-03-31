@@ -9,26 +9,32 @@ local player = game.Players.LocalPlayer
 -- =========================
 -- Main Window
 -- =========================
-local Window = Library:CreateWindow({
+local Window = WindUI:CreateWindow({
     Title = "KOMAT Hub",
     Desc  = "Evade Hub on top",
     Icon  = 105059922903197,
+
+    Size = UDim2.fromOffset(580, 460),
+    MinSize = Vector2.new(560, 350),
+    MaxSize = Vector2.new(850, 560),
+
     Theme = "Dark",
-    Config = { Keybind = Enum.KeyCode.LeftControl, Size = UDim2.new(0,500,0,400) },
-    CloseUIButton = { Enabled=true, Text="KOMAT Unity Hub" }
-})
+    Transparent = true,
+    Resizable = true,
+    SideBarWidth = 200,
 
-Size = UDim2.fromOffset(580, 460),
-MinSize = Vector2.new(560, 350),
-MaxSize = Vector2.new(850, 560),
-Transparent = true,
-Theme = "Dark",
-Resizable = true,
-SideBarWidth = 200,
-BackgroundImageTransparency = 0.42,
-HideSearchBar = true,
-ScrollBarEnabled = false,
+    BackgroundImageTransparency = 0.42,
+    HideSearchBar = true,
+    ScrollBarEnabled = false,
 
+    Config = {
+        Keybind = Enum.KeyCode.LeftControl
+    },
+
+    CloseUIButton = {
+        Enabled = true,
+        Text = "KOMAT Unity Hub"
+    }
 })
 
 local SettingsTab = Window:Tab({Title="Settings", Icon="wrench"})
