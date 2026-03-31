@@ -1490,3 +1490,93 @@ SettingsTab:Toggle({
 
     end
 })
+
+-- =========================
+-- ESP Ticket
+-- =========================
+local espTicketEnabled = false
+local espObjects = {}
+
+local function addESP(part)
+    if espObjects[part] then return end
+    
+    -- เปลี่ยนสี Part
+    local originalColor = part.Color
+    part.Color = Color3.fromRGB(255, 255, 0) -- เหลือง
+    part.Material = Enum.Material.Neon
+
+    -- Billboard (ข้อความลอย)
+    local billboard = Instance.new("BillboardGui")
+    billboard.Size = UDim2.new(0,100,0,40)
+    billboard.AlwaysOnTop = true
+    billboard.Adornee = part
+    billboard.Parent = part
+
+    local text = Instance.new("TextLabel")
+    text.Size = UDim2.new(1,0,1,0)
+    text.BackgroundTransparency = 1
+    text.Text = "🎫 Ticket"
+    text.TextColor3 = Color3.fromRGB(255,255,0)
+    text.TextStrokeTransparency = 0
+    text.Font = Enum.Font.GothamBold
+    text.TextScaled = true
+    text.Parent = billboard
+
+    espObjects[part] = {
+        color = originalColor,
+        gui = billboard
+    }
+end
+
+local function removeESP(part)
+    if not espObjects[part] then return end
+    
+    -- คืนค่าสีเดิม
+    part.Color = espObjects[part].color
+    
+    -- ลบ GUI
+    if espObjects[part].gui then
+        espObjects[part].gui:Destroy()
+    end
+
+    espObjects[part] = nil
+end
+
+-- ตรวจหา Part ที่มีชื่อ "ticket"
+local function scanTickets()
+    for _, obj in pairs(workspace:GetDescendants()) do
+        if obj:IsA("BasePart") and string.find(string.lower(obj.Name), "ticket") then
+            addESP(obj)
+        end
+    end
+end
+
+-- ล้างทั้งหมด
+local function clearAllESP()
+    for part,_ in pairs(espObjects) do
+        removeESP(part)
+    end
+end
+
+-- Loop ตรวจของใหม่
+task.spawn(function()
+    while true do
+        if espTicketEnabled then
+            scanTickets()
+        end
+        task.wait(2)
+    end
+end)
+
+-- ปุ่มใน VisualsTab
+VisualsTab:Toggle({
+    Title = "ESP Ticket",
+    Desc = "แสดง Ticket สีเหลือง + ข้อความ",
+    Value = false,
+    Callback = function(state)
+        espTicketEnabled = state
+        if not state then
+            clearAllESP()
+        end
+    end
+})
