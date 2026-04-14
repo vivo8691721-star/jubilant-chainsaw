@@ -1,426 +1,275 @@
-local WindUI = loadstring(game:HttpGet(
-"https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"
-))()
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
-local TweenService = game:GetService("TweenService")
-local RunService = game:GetService("RunService")
-local player = game.Players.LocalPlayer
-
--- =========================
--- Main Window
--- =========================
-local Window = WindUI:CreateWindow({
-    Title = "KOMAT Hub",
-    Desc  = "Evade Hub on top",
-    Icon  = 105059922903197,
-
-    Size = UDim2.fromOffset(580, 460),
-    MinSize = Vector2.new(560, 350),
-    MaxSize = Vector2.new(850, 560),
-
-    Theme = "Dark",
-    Transparent = true,
-    Resizable = true,
-    SideBarWidth = 200,
-
-    BackgroundImageTransparency = 0.42,
-    HideSearchBar = true,
-    ScrollBarEnabled = false,
-
-    Config = {
-        Keybind = Enum.KeyCode.LeftControl
-    },
-
-    CloseUIButton = {
-        Enabled = true,
-        Text = "KOMAT Unity Hub"
-    }
+local Window = Rayfield:CreateWindow({
+Name = "KOMAT UNITY HUB",
+LoadingTitle = "Loading...",
+LoadingSubtitle = "Main Hub",
+ConfigurationSaving = {
+Enabled = false,
+},
+KeySystem = false,
 })
 
-local SettingsTab = Window:Tab({Title="Settings", Icon="wrench"})
-local MainTab     = Window:Tab({Title="Main Menu", Icon="star"})
-local TeleportTab = Window:Tab({Title="Teleport", Icon="navigation"})
-local VisualsTab  = Window:Tab({Title="Visuals", Icon="eye"})
-local ExtraTab    = Window:Tab({Title="Extras", Icon="tag"})
-local FPSTab      = Window:Tab({Title="FPS", Icon="speedometer"})
-local MapTab    = Window:Tab({Title="Map", Icon="map"})
-local EventTab    = Window:Tab({Title="Events", Icon="calendar"})
+local Main = Window:CreateTab("Main", 4483362458)
+local Event = Window:CreateTab("Event", 7734068495)
 
-
-local autoJump = false
-local floatingJumpButton
-local FloatingGui
-
--- GUI ปุ่มลอย
-FloatingGui = Instance.new("ScreenGui")
-FloatingGui.Name = "FloatingJumpGui"
-FloatingGui.ResetOnSpawn = false
-FloatingGui.Enabled = false
-FloatingGui.Parent = player:WaitForChild("PlayerGui")
-
--- สร้างปุ่มลอย
-local function createFloatingJumpButton()
-
-if floatingJumpButton then return end  
-
-local btn = Instance.new("TextButton")  
-btn.Size = UDim2.new(0,140,0,52)  
-btn.Position = UDim2.new(0.5,-70,0.8,0)  
-btn.AnchorPoint = Vector2.new(0.5,0)  
-btn.BackgroundColor3 = Color3.fromRGB(180,220,255)  
-btn.BackgroundTransparency = 0.35  
-btn.TextColor3 = Color3.fromRGB(0,70,150)  
-btn.Text = "Auto Jump : OFF"  
-btn.Font = Enum.Font.GothamBold  
-btn.TextSize = 14  
-btn.Parent = FloatingGui  
-btn.Active = true  
-btn.Draggable = true  
-
-local corner = Instance.new("UICorner", btn)  
-corner.CornerRadius = UDim.new(0,18)  
-
-local stroke = Instance.new("UIStroke", btn)  
-stroke.Thickness = 2.5  
-stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border  
-stroke.Color = Color3.fromRGB(80,170,255)  
-
-floatingJumpButton = btn  
-
-task.spawn(function()  
-	while btn.Parent do  
-
-		TweenService:Create(  
-			stroke,  
-			TweenInfo.new(0.9, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut),  
-			{Color = Color3.fromRGB(0,90,255)}  
-		):Play()  
-
-		task.wait(0.9)  
-
-		TweenService:Create(  
-			stroke,  
-			TweenInfo.new(0.9, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut),  
-			{Color = Color3.fromRGB(150,230,255)}  
-		):Play()  
-
-		task.wait(0.9)  
-
-	end  
-end)  
-
-btn.MouseButton1Click:Connect(function()  
-
-	autoJump = not autoJump  
-
-	if autoJump then  
-		btn.Text = "Auto Jump : ON"  
-	else  
-		btn.Text = "Auto Jump : OFF"  
-	end  
-
-end)
-
-end
-
-createFloatingJumpButton()
-
--- Toggle Auto Jump
-MainTab:Toggle({
-Title = "Auto Jump",
-Default = ‎"ออโตักระโดด",
-Callback = function(state)
-
-autoJump = state  
-
-    if floatingJumpButton then  
-        if state then  
-            floatingJumpButton.Text = "Auto Jump : ON"  
-        else  
-            floatingJumpButton.Text = "Auto Jump : OFF"  
-        end  
-    end  
-
-end
-
-})
-
--- Toggle Float Button
-MainTab:Toggle({
-Title = "Float Auto Jump",
-Default = false,
-Callback = function(state)
-
-FloatingGui.Enabled = state  
-
-    if not state then  
-        autoJump = false  
-
-        if floatingJumpButton then  
-            floatingJumpButton.Text = "Auto Jump : OFF"  
-        end  
-    end  
-
-end
-
-})
-
--- ระบบ Auto Jump
-RunService.RenderStepped:Connect(function()
-
-if autoJump then  
-
-	local char = player.Character  
-	if char then  
-
-		local hum = char:FindFirstChildOfClass("Humanoid")  
-
-		if hum then  
-			if hum.FloorMaterial ~= Enum.Material.Air then  
-				hum:ChangeState(Enum.HumanoidStateType.Jumping)  
-			end  
-		end  
-
-	end  
-
-end
-
-end)
-
--- =========================
--- Services & Player
--- =========================
 local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local TweenService = game:GetService("TweenService")
 local player = Players.LocalPlayer
 
--- =========================
--- Floating GUI
--- =========================
-local FloatingGui = Instance.new("ScreenGui")
-FloatingGui.Name = "FloatingGui"
-FloatingGui.ResetOnSpawn = false
-FloatingGui.Parent = player:WaitForChild("PlayerGui")
+local autoFarm = false
 
--- =====================
--- HEAVY FPS LAG SYSTEM
--- =====================
-local lagging = false
-local floatingLagButton
-
-local function lagFPSHeavy(time)
-	if lagging then return end
-	lagging = true
-
-	task.spawn(function()
-		local start = tick()
-		while tick() - start < time do
-			local t = {}
-			for i = 1, 4e6 do
-				t[i] = math.random()
-			end
-			RunService.Heartbeat:Wait()
-		end
-		lagging = false
-	end)
-end
-
--- =========================
--- ปุ่มลอย Lag Switch
--- =========================
-local function createFloatingLagButton()
-	if floatingLagButton then return end
-
-	local btn = Instance.new("TextButton")
-	btn.Size = UDim2.new(0,140,0,52)
-	btn.Position = UDim2.new(0.5,-70,0.87,0)
-	btn.AnchorPoint = Vector2.new(0.5,0)
-	btn.BackgroundColor3 = Color3.fromRGB(180,220,255)
-	btn.BackgroundTransparency = 0.35
-	btn.TextColor3 = Color3.fromRGB(0,70,150)
-	btn.Text = "Lag Switch"
-	btn.Font = Enum.Font.GothamBold
-	btn.TextSize = 14
-	btn.Parent = FloatingGui
-	btn.Active = true
-	btn.Draggable = true
-
-	local corner = Instance.new("UICorner", btn)
-	corner.CornerRadius = UDim.new(0,18)
-
-	-- ขอบปุ่มจริง
-	local stroke = Instance.new("UIStroke", btn)
-	stroke.Thickness = 2.5
-	stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-	stroke.Color = Color3.fromRGB(0,120,255)
-
-	-- ไล่สีขอบ น้ำเงิน ↔ ฟ้าอ่อน
-	task.spawn(function()
-		while btn.Parent do
-			TweenService:Create(
-				stroke,
-				TweenInfo.new(0.8, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut),
-				{Color = Color3.fromRGB(0,80,255)}
-			):Play()
-			task.wait(0.8)
-			TweenService:Create(
-				stroke,
-				TweenInfo.new(0.8, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut),
-				{Color = Color3.fromRGB(160,230,255)}
-			):Play()
-			task.wait(0.8)
-		end
-	end)
-
-	btn.MouseButton1Click:Connect(function()
-		lagFPSHeavy(0.5)
-	end)
-
-	floatingLagButton = btn
-end
-
-local function removeFloatingLagButton()
-	if floatingLagButton then
-		floatingLagButton:Destroy()
-		floatingLagButton = nil
-	end
-end
-
--- =========================
--- ปุ่มในเมนูหลัก
--- =========================
-MainTab:Button({
-	Title = "Lag Switch ",
-	Desc = "FPS -1 ",
-	Callback = function()
-		lagFPSHeavy(0.5)
-	end
-})
-
-MainTab:Toggle({
-	Title = "Lag Switch (float)",
-	Desc = "Floating button",
-	Value = false,
-	Callback = function(v)
-		if v then
-			createFloatingLagButton()
-		else
-			removeFloatingLagButton()
-		end
-	end
-})
-
--- =========================
--- AUTO BOUNCE SYSTEM
--- =========================
-local autoBounce = false
-local floatingBounceButton
-local bouncePower = 150
-local groundCheckDistance = 8
+Main:CreateToggle({
+Name = "Auto Farm 💰",
+CurrentValue = false,
+Callback = function(Value)
+autoFarm = Value
 
 task.spawn(function()
-	while true do
-		RunService.Heartbeat:Wait()
-		if not autoBounce then continue end
-
-		local char = player.Character
-		if not char then continue end
-
-		local root = char:FindFirstChild("HumanoidRootPart")
-		local humanoid = char:FindFirstChildOfClass("Humanoid")
-		if not root or not humanoid then continue end
-
-		local rayOrigin = root.Position
-		local rayDirection = Vector3.new(0, -groundCheckDistance, 0)
-		local params = RaycastParams.new()
-		params.FilterDescendantsInstances = {char}
-		params.FilterType = Enum.RaycastFilterType.Blacklist
-
-		local ray = workspace:Raycast(rayOrigin, rayDirection, params)
-
-		if ray and root.Velocity.Y < 0 then
-			root.Velocity = Vector3.new(root.Velocity.X, bouncePower, root.Velocity.Z)
-		end
-	end
+while autoFarm do
+local char = player.Character
+if char and char:FindFirstChild("HumanoidRootPart") then
+char.HumanoidRootPart.CFrame = CFrame.new(
+char.HumanoidRootPart.Position.X,
+1200,
+char.HumanoidRootPart.Position.Z
+)
+end
+task.wait(1)
+end
 end)
-
--- =========================
--- Floating Auto Bounce Button
--- =========================
-local function createFloatingBounceButton()
-	if floatingBounceButton then return end
-
-	local btn = Instance.new("TextButton")
-	btn.Size = UDim2.new(0,140,0,52)
-	btn.Position = UDim2.new(0.5,-70,0.78,0)
-	btn.AnchorPoint = Vector2.new(0.5,0)
-	btn.BackgroundColor3 = Color3.fromRGB(180,220,255)
-	btn.BackgroundTransparency = 0.35
-	btn.TextColor3 = Color3.fromRGB(0,70,150)
-	btn.Text = "Auto Bounce : OFF"
-	btn.Font = Enum.Font.GothamBold
-	btn.TextSize = 14
-	btn.Parent = FloatingGui
-	btn.Active = true
-	btn.Draggable = true
-
-	local corner = Instance.new("UICorner", btn)
-	corner.CornerRadius = UDim.new(0,18)
-
-	local stroke = Instance.new("UIStroke", btn)
-	stroke.Thickness = 2.5
-	stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-	stroke.Color = Color3.fromRGB(0,120,255)
-
-	task.spawn(function()
-		while btn.Parent do
-			TweenService:Create(
-				stroke,
-				TweenInfo.new(0.8, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut),
-				{Color = Color3.fromRGB(0,80,255)}
-			):Play()
-			task.wait(0.8)
-			TweenService:Create(
-				stroke,
-				TweenInfo.new(0.8, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut),
-				{Color = Color3.fromRGB(160,230,255)}
-			):Play()
-			task.wait(0.8)
-		end
-	end)
-
-	btn.MouseButton1Click:Connect(function()
-		autoBounce = not autoBounce
-		btn.Text = autoBounce and "Auto Bounce : ON" or "Auto Bounce : OFF"
-	end)
-
-	floatingBounceButton = btn
 end
 
-local function removeFloatingBounceButton()
-	if floatingBounceButton then
-		floatingBounceButton:Destroy()
-		floatingBounceButton = nil
-	end
-end
-
--- =========================
--- Main Menu Buttons
--- =========================
-MainTab:Toggle({
-	Title = "Auto Bounce (Normal)",
-	Desc = "Fall from height → Bounce up 150",
-	Value = false,
-	Callback = function(v)
-		autoBounce = v
-	end
 })
 
-MainTab:Toggle({
-	Title = "Auto Bounce (Floating Button)",
-	Desc = "Light blue floating button with animated blue border",
-	Value = false,
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local player = Players.LocalPlayer
+
+local autoReviveEnabled = false
+local autoRespawnMethod = "Fake Revive"
+local lastSavedPosition = nil
+
+local function setupAutoRevive(character)
+task.defer(function()
+local hrp = character:WaitForChild("HumanoidRootPart", 5)
+local humanoid = character:WaitForChild("Humanoid", 5)
+if not hrp or not humanoid then return end
+
+-- เก็บตำแหน่งล่าสุด
+task.spawn(function()
+while character and character.Parent do
+local root = character:FindFirstChild("HumanoidRootPart")
+if root then
+character:SetAttribute("LastPosition", root.Position)
+lastSavedPosition = root.Position
+end
+task.wait(0.2)
+end
+end)
+
+-- Downed system
+character:GetAttributeChangedSignal("Downed"):Connect(function()
+if not autoReviveEnabled then return end
+if character:GetAttribute("Downed") ~= true then return end
+if autoRespawnMethod ~= "Fake Revive" then return end
+
+if hrp then          
+    lastSavedPosition = hrp.Position          
+end          
+
+task.wait(3)          
+
+local start = tick()          
+
+repeat          
+    pcall(function()          
+        ReplicatedStorage:WaitForChild("Events", 9e9)          
+            :WaitForChild("Player", 9e9)          
+            :WaitForChild("ChangePlayerMode", 9e9)          
+            :FireServer(true)          
+    end)          
+    task.wait(1)          
+until character:GetAttribute("Downed") ~= true or tick() - start > 6          
+
+local newChar = player.Character or player.CharacterAdded:Wait()          
+local newHRP = newChar:WaitForChild("HumanoidRootPart")          
+
+if lastSavedPosition and newHRP then          
+    newHRP.CFrame = CFrame.new(lastSavedPosition + Vector3.new(0, 3, 0))          
+    task.wait(0.5)          
+end
+
+end)
+
+end)
+
+end
+
+-- รีสตาร์ทตอนเกิดตัวละครใหม่
+player.CharacterAdded:Connect(function(char)
+if autoReviveEnabled then
+setupAutoRevive(char)
+end
+end)
+
+-- 🔘 Toggle Rayfield
+Main:CreateToggle({
+Name = "Auto Revive 💀 (Fake System)",
+CurrentValue = false,
+Callback = function(Value)
+autoReviveEnabled = Value
+
+if Value and player.Character then
+setupAutoRevive(player.Character)
+end
+end
+
+})
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local LocalPlayer = Players.LocalPlayer
+
+local interactEvent = ReplicatedStorage:WaitForChild("Events")
+:WaitForChild("Character")
+:WaitForChild("Interact")
+
+-- =========================
+-- SETTINGS
+-- =========================
+
+local autoTpReviveEnabled = false
+local reviveRange = 50
+local reviveLoop
+
+-- =========================
+-- CHECK DOWNED / DEAD
+-- =========================
+
+local function isDown(plr)
+if not plr.Character then return false end
+return plr.Character:GetAttribute("Downed") == true
+end
+
+local function isDead(plr)
+local char = plr.Character
+if not char then return false end
+
+local hum = char:FindFirstChildOfClass("Humanoid")  
+if not hum then return false end  
+
+return hum.Health <= 0
+
+end
+
+-- =========================
+-- MAIN LOOP
+-- =========================
+
+local function startAutoTpRevive()
+if reviveLoop then return end
+
+reviveLoop = RunService.Heartbeat:Connect(function()  
+    if not autoTpReviveEnabled then return end  
+
+    local char = LocalPlayer.Character  
+    local hrp = char and char:FindFirstChild("HumanoidRootPart")  
+    if not hrp then return end  
+
+    for _, pl in ipairs(Players:GetPlayers()) do  
+        if pl ~= LocalPlayer and pl.Character then  
+
+            local pChar = pl.Character  
+            local pHrp = pChar:FindFirstChild("HumanoidRootPart")  
+
+            if pHrp and (isDown(pl) or isDead(pl)) then  
+
+                local dist = (hrp.Position - pHrp.Position).Magnitude  
+
+                -- 🚀 TP ไปหาเป้าหมาย  
+                if dist > reviveRange then  
+                    hrp.CFrame = pHrp.CFrame * CFrame.new(0, 0, 2)  
+                end  
+
+                -- 💉 ชุบ  
+                pcall(function()  
+                    interactEvent:FireServer("Revive", true, pl.Name)  
+                end)  
+
+            end  
+        end  
+    end  
+end)
+
+end
+
+local function stopAutoTpRevive()
+autoTpReviveEnabled = false
+
+if reviveLoop then  
+    reviveLoop:Disconnect()  
+    reviveLoop = nil  
+end
+
+end
+
+-- =========================
+-- TOGGLE (FULL SYSTEM)
+-- =========================
+
+Main:CreateToggle({
+Name = "Auto Tp Restore Player 🚀",
+CurrentValue = false,
+Callback = function(Value)
+autoTpReviveEnabled = Value
+
+if Value then  
+        startAutoTpRevive()  
+    else  
+        stopAutoTpRevive()  
+    end  
+end
+
+})
+
+local VirtualUser = game:GetService("VirtualUser")
+local Players = game:GetService("Players")
+
+local player = Players.LocalPlayer
+local AntiAFKConnection = nil
+
+local antiKickEnabled = false
+
+Main:CreateToggle({
+    Name = "Anti-Kick 🛡️",
+    CurrentValue = false,
+    Callback = function(Value)
+        antiKickEnabled = Value
+
+        if Value then
+            -- เปิดระบบกัน AFK
+            if not AntiAFKConnection then
+                AntiAFKConnection = player.Idled:Connect(function()
+                    pcall(function()
+                        VirtualUser:Button2Down(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+                        task.wait(1)
+                        VirtualUser:Button2Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+                    end)
+                end)
+            end
+
+        else
+            -- ปิดระบบ
+            if AntiAFKConnection then
+                AntiAFKConnection:Disconnect()
+                AntiAFKConnection = nil
+            end
+        end
+    end
+}) = false,
 	Callback = function(v)
 		if v then
 			createFloatingBounceButton()
